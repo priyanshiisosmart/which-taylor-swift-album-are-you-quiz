@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Which Taylor Swift Album Are You?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kirang+Haerang&display=swap" rel="stylesheet">
+<style>
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; height:100%; overflow:hidden; }
+body{
+  font-family:"Kirang Haerang",sans-serif; font-weight:400; letter-spacing:.3px;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,.5), transparent 40%),
+    radial-gradient(circle at 80% 85%, rgba(255,255,255,.35), transparent 45%),
+    linear-gradient(160deg,#ffe2ef 0%, #ffd1e7 45%, #f2c7ec 100%);
+  display:flex; align-items:center; justify-content:center;
+}
+.story{
+  position:relative; width:100vw; height:100%; max-width:calc(100vh * 9 / 16);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(28px + env(safe-area-inset-bottom,0px));
+  text-align:center; overflow:hidden;
+}
+.screen{ display:none; width:100%; flex-direction:column; align-items:center; }
+.screen.active{ display:flex; }
+.eyebrow{ font-size:15px; letter-spacing:2px; text-transform:uppercase; color:#a4276b; opacity:.8; margin-bottom:6px; }
+.title{ font-size:34px; color:#5a1a4a; line-height:1.15; margin-bottom:16px; }
+.sub{ font-size:16px; color:#8a5a7a; margin-bottom:24px; max-width:280px; }
+.btn{ border:none; border-radius:999px; padding:14px 34px; background:#cf2a85; color:#fff; font:inherit; font-size:16px; cursor:pointer; box-shadow:0 10px 24px rgba(194,24,91,.35); }
+.btn.ghost{ background:#fff8fb; color:#5a1a4a; border:2px dashed #cf2a85; box-shadow:none; }
+
+.vinyl{ width:150px; height:150px; margin-bottom:22px; animation:spin 6s linear infinite; filter:drop-shadow(0 8px 14px rgba(90,26,74,.3)); }
+.vinyl.big{ width:170px; height:170px; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.progress{ display:flex; gap:6px; width:100%; max-width:260px; margin-bottom:10px; }
+.seg{ flex:1; height:5px; border-radius:3px; background:rgba(90,26,74,.15); }
+.seg.done{ background:#cf2a85; }
+.count{ font-size:14px; color:#a4276b; opacity:.8; margin-bottom:18px; }
+.q{ font-size:22px; color:#5a1a4a; line-height:1.3; max-width:300px; margin-bottom:20px; }
+.or{ font-size:14px; color:#a4276b; opacity:.7; margin:-4px 0; }
+.choices{ display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:300px; }
+.choice{
+  width:100%; display:flex; flex-direction:column; align-items:center; gap:6px;
+  background:rgba(255,248,251,.92); border:2px dashed #cf2a85; border-radius:22px;
+  padding:13px 14px; font:inherit; font-weight:400; font-size:16px; line-height:1.25; color:#5a1a4a; cursor:pointer;
+  transition:transform .15s ease, background .15s ease;
+}
+.choice .em{ font-size:30px; line-height:1; }
+.choice:active{ transform:scale(.96); background:#ffe1ee; }
+.choice.picked{ background:#cf2a85; color:#fff; border-style:solid; transform:scale(1.03); }
+.back{ margin-top:16px; background:none; border:none; font:inherit; font-size:15px; color:#a4276b; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+.back:disabled{ visibility:hidden; }
+
+.r-title{ font-size:30px; color:#cf2a85; margin:0 0 8px; line-height:1.2; font-weight:400; }
+.r-match{ font-family:system-ui,sans-serif; font-size:12px; letter-spacing:.6px; text-transform:uppercase; color:#8a5a7a; margin-bottom:10px; }
+.r-blurb{ font-size:16px; color:#8a5a7a; max-width:290px; margin-bottom:14px; }
+.r-box{ font-size:14px; color:#5a1a4a; background:rgba(255,248,251,.92); border:2px dashed #cf2a85; border-radius:14px; padding:8px 14px; margin-bottom:10px; max-width:290px; }
+.listen{ display:flex; gap:8px; margin-bottom:10px; }
+.listen a{ text-decoration:none; border-radius:999px; padding:9px 16px; background:#cf2a85; color:#fff; font-size:14px; box-shadow:0 6px 14px rgba(194,24,91,.3); }
+.listen a.alt{ background:#fff8fb; color:#5a1a4a; border:2px dashed #cf2a85; box-shadow:none; padding:7px 14px; }
+.embed{ width:100%; max-width:300px; margin-bottom:10px; }
+.embed iframe{ display:block; width:100%; height:80px; border:0; border-radius:12px; }
+.r-actions{ margin-top:10px; width:100%; max-width:260px; }
+.foot{ position:absolute; bottom:calc(14px + env(safe-area-inset-bottom,0px)); left:0; right:0; font-size:12px; color:#a4276b; opacity:.6; }
+</style>
+</head>
+<body>
+<div class="story">
+
+  <div class="screen active" id="intro">
+    <div class="eyebrow">this or that</div>
+    <div class="title">Which Taylor Swift<br>Album Are You?</div>
+    <div id="introVinyl"></div>
+    <div class="sub">8 quick picks. No overthinking, just trust your gut ✨</div>
+    <button class="btn" id="start" type="button">Drop the needle</button>
+  </div>
+
+  <div class="screen" id="quiz">
+    <div class="progress" id="progress"></div>
+    <div class="count" id="count"></div>
+    <div class="q" id="qText"></div>
+    <div class="choices" id="choices"></div>
+    <button class="back" id="back" type="button">← back</button>
+  </div>
+
+  <div class="screen" id="result">
+    <div id="resultVinyl"></div>
+    <h2 class="r-title" id="rTitle"></h2>
+    <div class="r-match" id="rMatch"></div>
+    <div class="r-blurb" id="rBlurb"></div>
+    <div class="r-box" id="rTrack"></div>
+    <div class="embed" id="rEmbed"></div>
+    <div class="listen" id="rListen"></div>
+    <div class="r-box" id="rRunner"></div>
+    <div class="r-actions"><button class="btn ghost" id="again" type="button">Flip the record</button></div>
+  </div>
+
+  <div class="foot">by @girlxgram</div>
+</div>
+
+<script>
+/* Each album has a profile on four 0–1 axes:
+   R = wears heart on sleeve, L = loud & bold, N = nostalgic & dreamy, S = sparkly & polished.
+   Your picks build your own profile, and the closest album wins. */
+const ALBUMS = [
+  { id:'taylorswift', name:'Taylor Swift', year:2006, track:'Our Song', color:'#7cc4e8', p:{R:.8,L:.4,N:.7,S:.2}, blurb:'Honest, earnest and a little country. You say exactly what you mean.' },
+  { id:'fearless', name:'Fearless', year:2008, track:'Love Story', color:'#f4c95d', p:{R:.9,L:.6,N:.8,S:.7}, blurb:'Golden, hopeful, fairytale energy. You leap first and it usually works out.' },
+  { id:'speaknow', name:'Speak Now', year:2010, track:'Enchanted', color:'#7c4fa0', p:{R:.9,L:.8,N:.7,S:.6}, blurb:'A dramatic romantic who says the brave thing out loud, even shaking.' },
+  { id:'red', name:'Red', year:2012, track:'All Too Well', color:'#b3122a', p:{R:.6,L:.9,N:.5,S:.4}, blurb:'Big feelings, no apologies. You love loudly and grieve just as loudly.' },
+  { id:'1989', name:'1989', year:2014, track:'Style', color:'#8fd8e8', p:{R:.4,L:.9,N:.2,S:.9}, blurb:'Sleek, city-lights confidence. You can turn any bad week into a dance floor.' },
+  { id:'reputation', name:'reputation', year:2017, track:'Delicate', color:'#2b2b2b', p:{R:.2,L:.8,N:.1,S:.7}, blurb:'Guarded, sharp and unbothered. You protect your peace fiercely.' },
+  { id:'lover', name:'Lover', year:2019, track:'Cruel Summer', color:'#f6b6d2', p:{R:.9,L:.6,N:.6,S:.9}, blurb:'Soft, pastel and a little chaotic. You believe in love and in glitter.' },
+  { id:'folklore', name:'folklore', year:2020, track:'cardigan', color:'#8a8f87', p:{R:.6,L:.1,N:.8,S:.1}, blurb:'Cabin-and-cardigan energy. You feel everything quietly and deeply.' },
+  { id:'evermore', name:'evermore', year:2020, track:'willow', color:'#a9713f', p:{R:.5,L:.2,N:.6,S:.2}, blurb:'A bit wilder than folklore. You turn every feeling into a whole story.' },
+  { id:'midnights', name:'Midnights', year:2022, track:'Anti-Hero', color:'#2b3a67', p:{R:.3,L:.4,N:.3,S:.6}, blurb:'3am thoughts, sharp wit and a lovable spiral. You overthink in style.' },
+  { id:'ttpd', name:'The Tortured Poets Department', year:2024, track:'So Long, London', color:'#b9b2a6', p:{R:.3,L:.5,N:.4,S:.1}, blurb:'You write it down first and feel it second. Dramatic, literary, unfiltered.' },
+  { id:'showgirl', name:'The Life of a Showgirl', year:2025, track:'The Fate of Ophelia', color:'#e8b13a', p:{R:.5,L:.9,N:.2,S:.9}, blurb:'Center stage, full sparkle. You were always going to end up here.' }
+];
+
+/* v = 1 pushes your profile up on that axis, 0 pushes it down */
+const QUESTIONS = [
+  { q:'Saturday night, you\u2019d rather be\u2026', a:{ em:'💌', t:'Writing a love letter you\u2019ll maybe send', ax:'R', v:1 }, b:{ em:'🎬', t:'Movie night with my favorite people', ax:'R', v:0.5 }, c:{ em:'🕶️', t:'Phone off, nobody gets access to me', ax:'R', v:0 } },
+  { q:'Karaoke night. You\u2026', a:{ em:'🎤', t:'Grab the mic and go full performance', ax:'L', v:1 }, b:{ em:'🎶', t:'Join a big group number with everyone', ax:'L', v:0.5 }, c:{ em:'🛋️', t:'Sing along from the couch', ax:'L', v:0 } },
+  { q:'Your camera roll is mostly\u2026', a:{ em:'📼', t:'Old memories I keep revisiting', ax:'N', v:1 }, b:{ em:'🖼️', t:'A mix of old favorites and new', ax:'N', v:0.5 }, c:{ em:'📱', t:'Whatever is happening right now', ax:'N', v:0 } },
+  { q:'Pick your getting-ready look', a:{ em:'💎', t:'Full glam, hair and makeup done', ax:'S', v:1 }, b:{ em:'✨', t:'Cute outfit, quick gloss and done', ax:'S', v:0.5 }, c:{ em:'👖', t:'Jeans and a tee, hair in a clip', ax:'S', v:0 } },
+  { q:'A first date should feel like\u2026', a:{ em:'🌹', t:'Candlelight, all in from minute one', ax:'R', v:1 }, b:{ em:'☕', t:'Coffee and good conversation', ax:'R', v:0.5 }, c:{ em:'🎳', t:'Casual and light, watching for red flags', ax:'R', v:0 } },
+  { q:'Your perfect room is\u2026', a:{ em:'🪩', t:'Packed, loud, lights flashing', ax:'L', v:1 }, b:{ em:'🍕', t:'A house party with my friends', ax:'L', v:0.5 }, c:{ em:'🕯️', t:'Small, candlelit, four people', ax:'L', v:0 } },
+  { q:'You\u2019d rather live in\u2026', a:{ em:'🏰', t:'A fairytale', ax:'N', v:1 }, b:{ em:'🏡', t:'A cozy small town', ax:'N', v:0.5 }, c:{ em:'🌆', t:'The real city, sharp and right now', ax:'N', v:0 } },
+  { q:'Your ideal soundtrack is\u2026', a:{ em:'🎹', t:'Glossy synths and huge hooks', ax:'S', v:1 }, b:{ em:'🎧', t:'Dreamy indie pop', ax:'S', v:0.5 }, c:{ em:'🎸', t:'Acoustic guitar and strings', ax:'S', v:0 } }
+];
+
+/* ===== SPOTIFY EMBEDS: paste your track IDs here =====
+   How to get one: in Spotify, right-click a song > Share > Copy Song Link.
+   You get https://open.spotify.com/track/XXXXXXXXXXXXXXXXXXXXXX?si=...
+   Paste just the XXXX part (between /track/ and the ?) as the value.
+   Leave '' to fall back to the Play on Spotify / YouTube buttons for that album. */
+const SPOTIFY_IDS = {
+  taylorswift: '1j6gmK6u4WNI33lMZ8dC1s',  // Our Song
+  fearless: '3CeCwYWvdfXbZLXFhBrbnf',     // Love Story
+  speaknow: '3sW3oSbzsfecv9XoUdGs7h',     // Enchanted
+  red: '6GNRkaWUB0Lwc19SdkTgx8',          // All Too Well
+  '1989': '0ug5NqcwcFR2xrfTkc7k8e',       // Style
+  reputation: '6NFyWDv5CjfwuzoCkw47Xf',   // Delicate
+  lover: '1BxfuPKGuaTgP7aM0Bbdwr',        // Cruel Summer
+  folklore: '4R2kfaDFhslZEMJqAFNpdd',     // cardigan
+  evermore: '0lx2cLdOt3piJbcaXIV74f',     // willow
+  midnights: '0V3wPSX9ygBnCm8psDIegu',    // Anti-Hero
+  ttpd: '3Vevii7qKqrmW8CcyzBHDl',         // So Long, London
+  showgirl: '53iuhJlwXhSER5J2IYYv1W'      // The Fate of Ophelia
+};
+
+const $ = function(id){ return document.getElementById(id); };
+let idx = 0, picks = [];
+
+function vinyl(color, big){
+  const label = color === '#2b2b2b' ? '#5a5a5a' : color;
+  return '<svg class="vinyl' + (big ? ' big' : '') + '" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="50" cy="50" r="48" fill="#2b163a"/>' +
+    '<circle cx="50" cy="50" r="40" fill="none" stroke="#4a2a5c" stroke-width="1"/>' +
+    '<circle cx="50" cy="50" r="33" fill="none" stroke="#4a2a5c" stroke-width="1"/>' +
+    '<circle cx="50" cy="50" r="26" fill="none" stroke="#4a2a5c" stroke-width="1"/>' +
+    '<path d="M50,6 A44,44 0 0 1 90,32" fill="none" stroke="#fff" stroke-width="2" opacity=".25" stroke-linecap="round"/>' +
+    '<circle cx="50" cy="50" r="17" fill="' + label + '" stroke="#fff" stroke-width="1.5"/>' +
+    '<circle cx="50" cy="50" r="3" fill="#ffe1ee"/></svg>';
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  $(id).classList.add('active');
+}
+
+function renderQ(){
+  const q = QUESTIONS[idx];
+  $('progress').innerHTML = QUESTIONS.map(function(_, i){ return '<div class="seg' + (i < idx ? ' done' : '') + '"></div>'; }).join('');
+  $('count').textContent = (idx + 1) + ' of ' + QUESTIONS.length;
+  $('qText').textContent = q.q;
+  $('back').disabled = idx === 0;
+  const html = function(o, k){
+    return '<button class="choice' + (picks[idx] === k ? ' picked' : '') + '" type="button" data-k="' + k + '"><span class="em">' + o.em + '</span>' + o.t + '</button>';
+  };
+  $('choices').innerHTML = html(q.a, 'a') + '<div class="or">or</div>' + html(q.b, 'b') + '<div class="or">or</div>' + html(q.c, 'c');
+  $('choices').querySelectorAll('.choice').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      picks[idx] = btn.dataset.k;
+      btn.classList.add('picked');
+      setTimeout(function(){
+        idx++;
+        if(idx >= QUESTIONS.length) showResult(); else renderQ();
+      }, 260);
+    });
+  });
+  show('quiz');
+}
+
+function showResult(){
+  /* build your profile: average of your picks on each axis */
+  const sum = {R:0,L:0,N:0,S:0}, n = {R:0,L:0,N:0,S:0};
+  QUESTIONS.forEach(function(q, i){
+    const o = q[picks[i]];
+    sum[o.ax] += o.v; n[o.ax]++;
+  });
+  const me = {};
+  Object.keys(sum).forEach(function(k){ me[k] = n[k] ? sum[k] / n[k] : .5; });
+
+  const ranked = ALBUMS.map(function(a){
+    let d = 0;
+    Object.keys(me).forEach(function(k){ d += Math.pow(me[k] - a.p[k], 2); });
+    return { a:a, d:Math.sqrt(d) + Math.random() * 0.001 };
+  }).sort(function(x, y){ return x.d - y.d; });
+
+  const best = ranked[0], second = ranked[1];
+  const pct = function(r){ return Math.max(55, Math.round(100 - r.d * 38)); };
+  $('resultVinyl').innerHTML = vinyl(best.a.color, true);
+  $('rTitle').textContent = best.a.name;
+  $('rMatch').textContent = pct(best) + '% match \u00b7 ' + best.a.year;
+  $('rBlurb').textContent = best.a.blurb;
+  $('rTrack').textContent = '\ud83c\udfb5 start with \u201c' + best.a.track + '\u201d';
+  const sid = (SPOTIFY_IDS[best.a.id] || '').replace(/[^A-Za-z0-9]/g, '');
+  $('rEmbed').innerHTML = sid
+    ? '<iframe src="https://open.spotify.com/embed/track/' + sid + '?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="' + best.a.track + '"></iframe>'
+    : '';
+  $('rListen').style.display = sid ? 'none' : 'flex';
+  const sq = encodeURIComponent(best.a.track + ' Taylor Swift');
+  $('rListen').innerHTML = '<a href="https://open.spotify.com/search/' + sq + '" target="_blank" rel="noopener">\u25b6 Play on Spotify</a>' +
+    '<a class="alt" href="https://www.youtube.com/results?search_query=' + sq + '" target="_blank" rel="noopener">YouTube</a>';
+  $('rRunner').textContent = 'runner-up: ' + second.a.name + ' (' + pct(second) + '%)';
+  show('result');
+}
+
+function restart(){ idx = 0; picks = []; renderQ(); }
+$('introVinyl').innerHTML = vinyl('#ff7ec0', false);
+$('start').addEventListener('click', restart);
+$('again').addEventListener('click', restart);
+$('back').addEventListener('click', function(){ if(idx > 0){ idx--; renderQ(); } });
+</script>
+</body>
+</html>
