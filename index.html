@@ -19,9 +19,9 @@ body{
 }
 .story{
   position:relative; width:100vw; height:100%; max-width:calc(100vh * 9 / 16);
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  display:flex; flex-direction:column; align-items:center; justify-content:safe center;
   padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(28px + env(safe-area-inset-bottom,0px));
-  text-align:center; overflow:hidden;
+  text-align:center; overflow-x:hidden; overflow-y:auto;
 }
 .screen{ display:none; width:100%; flex-direction:column; align-items:center; }
 .screen.active{ display:flex; }
@@ -62,7 +62,7 @@ body{
 .listen a{ text-decoration:none; border-radius:999px; padding:9px 16px; background:#cf2a85; color:#fff; font-size:14px; box-shadow:0 6px 14px rgba(194,24,91,.3); }
 .listen a.alt{ background:#fff8fb; color:#5a1a4a; border:2px dashed #cf2a85; box-shadow:none; padding:7px 14px; }
 .embed{ width:100%; max-width:300px; margin-bottom:10px; }
-.embed iframe{ display:block; width:100%; height:80px; border:0; border-radius:12px; }
+.embed iframe{ display:block; width:100%; height:152px; border:0; border-radius:12px; }
 .r-actions{ margin-top:10px; width:100%; max-width:260px; }
 .foot{ position:absolute; bottom:calc(14px + env(safe-area-inset-bottom,0px)); left:0; right:0; font-size:12px; color:#a4276b; opacity:.6; }
 </style>
@@ -95,6 +95,8 @@ body{
     <div class="embed" id="rEmbed"></div>
     <div class="listen" id="rListen"></div>
     <div class="r-box" id="rRunner"></div>
+    <div class="embed" id="rEmbed2"></div>
+    <div class="listen" id="rListen2"></div>
     <div class="r-actions"><button class="btn ghost" id="again" type="button">Flip the record</button></div>
   </div>
 
@@ -132,24 +134,22 @@ const QUESTIONS = [
   { q:'Your ideal soundtrack is\u2026', a:{ em:'🎹', t:'Glossy synths and huge hooks', ax:'S', v:1 }, b:{ em:'🎧', t:'Dreamy indie pop', ax:'S', v:0.5 }, c:{ em:'🎸', t:'Acoustic guitar and strings', ax:'S', v:0 } }
 ];
 
-/* ===== SPOTIFY EMBEDS: paste your track IDs here =====
-   How to get one: in Spotify, right-click a song > Share > Copy Song Link.
-   You get https://open.spotify.com/track/XXXXXXXXXXXXXXXXXXXXXX?si=...
-   Paste just the XXXX part (between /track/ and the ?) as the value.
+/* ===== SPOTIFY ALBUM EMBEDS =====
+   Each value is the ID from an open.spotify.com/album/XXXX link.
    Leave '' to fall back to the Play on Spotify / YouTube buttons for that album. */
-const SPOTIFY_IDS = {
-  taylorswift: '1j6gmK6u4WNI33lMZ8dC1s',  // Our Song
-  fearless: '3CeCwYWvdfXbZLXFhBrbnf',     // Love Story
-  speaknow: '3sW3oSbzsfecv9XoUdGs7h',     // Enchanted
-  red: '6GNRkaWUB0Lwc19SdkTgx8',          // All Too Well
-  '1989': '0ug5NqcwcFR2xrfTkc7k8e',       // Style
-  reputation: '6NFyWDv5CjfwuzoCkw47Xf',   // Delicate
-  lover: '1BxfuPKGuaTgP7aM0Bbdwr',        // Cruel Summer
-  folklore: '4R2kfaDFhslZEMJqAFNpdd',     // cardigan
-  evermore: '0lx2cLdOt3piJbcaXIV74f',     // willow
-  midnights: '0V3wPSX9ygBnCm8psDIegu',    // Anti-Hero
-  ttpd: '3Vevii7qKqrmW8CcyzBHDl',         // So Long, London
-  showgirl: '53iuhJlwXhSER5J2IYYv1W'      // The Fate of Ophelia
+const SPOTIFY_ALBUM_IDS = {
+  taylorswift: '3fIMd26aazkglvPqOiB7WZ',  // Taylor Swift
+  fearless: '4hDok0OAJd57SGIT8xuWJH',     // Fearless (Taylor's Version)
+  speaknow: '5AEDGbliTTfjOB8TSm1sxt',     // Speak Now (Taylor's Version)
+  red: '6kZ42qRrzov54LcAk4onW9',          // Red (Taylor's Version)
+  '1989': '64LU4c1nfjz1t4VnGhagcg',       // 1989 (Taylor's Version)
+  reputation: '6DEjYFkNZh67HP7R9PSZvv',   // reputation
+  lover: '1NAmidJlEaVgA3MpcPFYGq',        // Lover
+  folklore: '2fenSS68JI1h4Fo296JfGr',     // folklore
+  evermore: '2Xoteh7uEpea4TohMxjtaq',     // evermore
+  midnights: '151w1FgRZfnKZA9FEcg9Z3',    // Midnights
+  ttpd: '1Mo4aZ8pdj6L1jx8zSwJnt',         // The Tortured Poets Department
+  showgirl: '4a6NzYL1YHRUgx9e3YZI6I'      // The Life of a Showgirl
 };
 
 const $ = function(id){ return document.getElementById(id); };
@@ -217,16 +217,20 @@ function showResult(){
   $('rTitle').textContent = best.a.name;
   $('rMatch').textContent = pct(best) + '% match \u00b7 ' + best.a.year;
   $('rBlurb').textContent = best.a.blurb;
-  $('rTrack').textContent = '\ud83c\udfb5 start with \u201c' + best.a.track + '\u201d';
-  const sid = (SPOTIFY_IDS[best.a.id] || '').replace(/[^A-Za-z0-9]/g, '');
-  $('rEmbed').innerHTML = sid
-    ? '<iframe src="https://open.spotify.com/embed/track/' + sid + '?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="' + best.a.track + '"></iframe>'
-    : '';
-  $('rListen').style.display = sid ? 'none' : 'flex';
-  const sq = encodeURIComponent(best.a.track + ' Taylor Swift');
-  $('rListen').innerHTML = '<a href="https://open.spotify.com/search/' + sq + '" target="_blank" rel="noopener">\u25b6 Play on Spotify</a>' +
-    '<a class="alt" href="https://www.youtube.com/results?search_query=' + sq + '" target="_blank" rel="noopener">YouTube</a>';
+  $('rTrack').textContent = '\ud83d\udcbf play the full album';
+  const player = function(al, embedId, listenId){
+    const sid = (SPOTIFY_ALBUM_IDS[al.id] || '').replace(/[^A-Za-z0-9]/g, '');
+    $(embedId).innerHTML = sid
+      ? '<iframe src="https://open.spotify.com/embed/album/' + sid + '?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="' + al.name + '"></iframe>'
+      : '';
+    $(listenId).style.display = sid ? 'none' : 'flex';
+    const q = encodeURIComponent(al.name + ' Taylor Swift album');
+    $(listenId).innerHTML = '<a href="https://open.spotify.com/search/' + q + '" target="_blank" rel="noopener">\u25b6 Play on Spotify</a>' +
+      '<a class="alt" href="https://www.youtube.com/results?search_query=' + q + '" target="_blank" rel="noopener">YouTube</a>';
+  };
+  player(best.a, 'rEmbed', 'rListen');
   $('rRunner').textContent = 'runner-up: ' + second.a.name + ' (' + pct(second) + '%)';
+  player(second.a, 'rEmbed2', 'rListen2');
   show('result');
 }
 
