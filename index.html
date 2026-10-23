@@ -67,6 +67,9 @@ body{
 .embed iframe{ display:block; width:100%; height:152px; border:0; border-radius:12px; }
 .r-actions{ margin-top:10px; width:100%; max-width:260px; }
 .foot{ position:absolute; bottom:calc(14px + env(safe-area-inset-bottom,0px)); left:0; right:0; font-size:12px; color:#a4276b; opacity:.6; }
+
+.stats{ display:none; position:absolute; top:calc(10px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%); z-index:5; font-family:system-ui,sans-serif; font-size:12px; color:#5a1a4a; background:rgba(255,248,251,.95); border:2px dashed #cf2a85; border-radius:999px; padding:6px 14px; white-space:nowrap; }
+.stats.on{ display:block; }
 </style>
 </head>
 <body>
@@ -102,6 +105,7 @@ body{
     <div class="r-actions"><button class="btn ghost" id="again" type="button">Flip the record</button></div>
   </div>
 
+  <div class="stats" id="stats"></div>
   <div class="foot">by @girlxgram</div>
 </div>
 
@@ -234,6 +238,7 @@ function showResult(){
   $('rRunner').textContent = 'runner-up: ' + second.a.name + ' (' + pct(second) + '%)';
   player(second.a, 'rEmbed2', 'rListen2');
   show('result');
+  track(best.a.id);
 }
 
 function restart(){ idx = 0; picks = []; renderQ(); }
@@ -241,6 +246,35 @@ $('introVinyl').innerHTML = vinyl('#ff7ec0', false);
 $('start').addEventListener('click', restart);
 $('again').addEventListener('click', restart);
 $('back').addEventListener('click', function(){ if(idx > 0){ idx--; renderQ(); } });
+
+/* ===== ANONYMOUS PLAYER TRACKING =====
+   Paste your Google Apps Script web app URL below (see setup steps).
+   Each browser gets a random anonymous ID; every finished quiz logs one row.
+   Add #stats to your page URL to see the totals. */
+const TRACK_URL = '';
+function visitorId(){
+  try{
+    let v = localStorage.getItem('tsq_vid');
+    if(!v){ v = (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'v' + Date.now() + Math.random().toString(36).slice(2); localStorage.setItem('tsq_vid', v); }
+    return v;
+  }catch(e){ return 'noid'; }
+}
+function track(albumId){
+  if(!TRACK_URL) return;
+  try{
+    fetch(TRACK_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({ id:visitorId(), album:albumId }), keepalive:true }).catch(function(){});
+  }catch(e){}
+}
+function showStats(){
+  if(!TRACK_URL || location.hash !== '#stats') return;
+  fetch(TRACK_URL).then(function(r){ return r.json(); }).then(function(d){
+    const el = $('stats');
+    el.textContent = '\ud83d\udc64 ' + d.unique + ' unique \u00b7 \ud83d\udd01 ' + d.repeat + ' repeat \u00b7 ' + d.plays + ' plays';
+    el.classList.add('on');
+  }).catch(function(){});
+}
+showStats();
 </script>
 </body>
 </html>
