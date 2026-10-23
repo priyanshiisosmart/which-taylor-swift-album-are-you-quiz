@@ -23,6 +23,8 @@ body{
   padding:calc(28px + env(safe-area-inset-top,0px)) 24px calc(28px + env(safe-area-inset-bottom,0px));
   text-align:center; overflow-x:hidden; overflow-y:auto;
 }
+.story{ scrollbar-width:none; -ms-overflow-style:none; }
+.story::-webkit-scrollbar{ display:none; }
 .screen{ display:none; width:100%; flex-direction:column; align-items:center; }
 .screen.active{ display:flex; }
 .eyebrow{ font-size:15px; letter-spacing:2px; text-transform:uppercase; color:#a4276b; opacity:.8; margin-bottom:6px; }
