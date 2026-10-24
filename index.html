@@ -245,6 +245,8 @@ function renderQ(){
       locked = true;
       const qi = idx;
       picks[qi] = btn.dataset.k;
+      /* clear any previously selected answer (e.g. after going back) so only the new pick is highlighted */
+      $('choices').querySelectorAll('.choice.picked').forEach(function(b){ b.classList.remove('picked'); });
       btn.classList.add('picked');
       react(qi, btn.dataset.k, true);
       setTimeout(function(){
