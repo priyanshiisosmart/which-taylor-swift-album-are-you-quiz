@@ -70,9 +70,60 @@ body{
 
 .stats{ display:none; position:absolute; top:calc(10px + env(safe-area-inset-top,0px)); left:50%; transform:translateX(-50%); z-index:5; font-family:system-ui,sans-serif; font-size:12px; color:#5a1a4a; background:rgba(255,248,251,.95); border:2px dashed #cf2a85; border-radius:999px; padding:6px 14px; white-space:nowrap; }
 .stats.on{ display:block; }
+
+/* side doodles: stick-figure singers that react to your picks (only when there is room beside the phone-width column) */
+:root{ --figH:min(29vh, 240px); }
+.doodle{ display:flex; position:fixed; bottom:0; z-index:0; pointer-events:none; width:38vw; height:var(--figH); align-items:flex-end; justify-content:center; }
+.doodle.l{ left:0; } .doodle.r{ right:0; }
+.doodle svg{ height:100%; width:auto; max-width:100%; overflow:visible; }
+/* phones and portrait screens: figures stand small in the bottom corners, behind the quiz */
+@media not all and (min-width:820px) and (min-aspect-ratio:1/1){ .story{ padding-bottom:calc(18px + env(safe-area-inset-bottom,0px) + var(--figH) * .7); } .fl{ font-size:24px; } }
+/* wide screens: full-height figures in the empty side space */
+@media (min-width:820px) and (min-aspect-ratio:1/1){ .doodle{ width:calc((100vw - min(100vw, 100vh * 9 / 16)) / 2); height:100%; padding:0 12px; } .doodle svg{ width:100%; height:auto; max-width:280px; max-height:92vh; } }
+.fig{ --dress:#ffc2de; }
+.fig .p, .fig .e, .fig .m, .fig .gl{ display:none; }
+.fig.has-letter .p-letter, .fig.has-popcorn .p-popcorn, .fig.has-phone .p-phone, .fig.has-phoneoff .p-phoneoff, .fig.has-mug .p-mug, .fig.has-rose .p-rose, .fig.has-ball .p-ball, .fig.has-candle .p-candle, .fig.has-pizza .p-pizza, .fig.has-keys .p-keys, .fig.has-headphones .p-headphones, .fig.has-clip .p-clip,
+.fig.has-mic .p-mic, .fig.has-heart .p-heart, .fig.has-pola .p-pola, .fig.has-shades .p-shades, .fig.has-crown .p-crown, .fig.has-guitar .p-guitar, .fig.has-glam .gl{ display:inline; }
+.fig[data-eyes="dot"] .e-dot, .fig[data-eyes="heart"] .e-heart, .fig[data-eyes="arc"] .e-arc, .fig[data-eyes="star"] .e-star, .fig[data-eyes="side"] .e-side{ display:inline; }
+.fig .sc{ font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif; transform-box:fill-box; transform-origin:center; }
+.fig .sc.pop{ animation:scPop .6s cubic-bezier(.3,1.6,.5,1); }
+@keyframes scPop{ from{ transform:scale(.2) rotate(-20deg); opacity:0; } to{ transform:scale(1) rotate(0); opacity:1; } }
+.fig[data-mouth="smile"] .m-smile, .fig[data-mouth="open"] .m-open, .fig[data-mouth="flat"] .m-flat{ display:inline; }
+.fig .dress{ fill:var(--dress); transition:fill .5s ease; }
+.armL,.armR,.legL,.legR,.head{ transition:transform .5s cubic-bezier(.3,1.5,.5,1); }
+.armL{ transform-origin:120px 150px; transform:rotate(calc(var(--al,15) * 1deg)); }
+.armR{ transform-origin:120px 150px; transform:rotate(calc(var(--ar,15) * -1deg)); }
+.legL{ transform-origin:120px 262px; transform:rotate(calc(var(--ll,0) * 1deg)); }
+.legR{ transform-origin:120px 262px; transform:rotate(calc(var(--lr,0) * -1deg)); }
+.head{ transform-origin:120px 122px; transform:rotate(calc(var(--tilt,0) * 1deg)); }
+.fb{ transform-origin:120px 352px; }
+.doodle.r .fb{ animation-delay:-.8s; }
+.fig.a-idle .fb{ animation:fIdle 3s ease-in-out infinite; }
+.fig.a-jump .fb{ animation:fJump .7s ease-in-out infinite; }
+.fig.a-sway .fb{ animation:fSway 1.6s ease-in-out infinite; }
+@keyframes fIdle{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+@keyframes fJump{ 0%,100%{ transform:translateY(0) scaleY(.96); } 40%{ transform:translateY(-34px) scaleY(1.03); } }
+@keyframes fSway{ 0%,100%{ transform:rotate(-3deg); } 50%{ transform:rotate(3deg); } }
+.fig.w-wave .armR{ animation:wvR .55s ease-in-out infinite; }
+.fig.w-dance .armL{ animation:wvL .5s ease-in-out infinite; }
+.fig.w-dance .armR{ animation:wvR .5s ease-in-out infinite .25s; }
+.fig.w-dance .legL{ animation:lgL .5s ease-in-out infinite; }
+.fig.w-dance .legR{ animation:lgR .5s ease-in-out infinite .25s; }
+@keyframes wvR{ 0%,100%{ transform:rotate(calc(var(--ar,15) * -1deg)); } 50%{ transform:rotate(calc((var(--ar,15) - 28) * -1deg)); } }
+@keyframes wvL{ 0%,100%{ transform:rotate(calc(var(--al,15) * 1deg)); } 50%{ transform:rotate(calc((var(--al,15) + 28) * 1deg)); } }
+@keyframes lgL{ 0%,100%{ transform:rotate(calc(var(--ll,0) * 1deg)); } 50%{ transform:rotate(calc((var(--ll,0) + 16) * 1deg)); } }
+@keyframes lgR{ 0%,100%{ transform:rotate(calc(var(--lr,0) * -1deg)); } 50%{ transform:rotate(calc((var(--lr,0) + 16) * -1deg)); } }
+.doodle .twk{ animation:twk 2.4s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+.doodle .twk:nth-of-type(2n){ animation-delay:-.8s; } .doodle .twk:nth-of-type(3n){ animation-delay:-1.5s; }
+@keyframes twk{ 0%,100%{ transform:scale(1); opacity:1; } 50%{ transform:scale(.7); opacity:.55; } }
+.fl{ position:absolute; bottom:48%; font-size:30px; line-height:1; animation:fl 1.5s ease-out forwards; }
+@keyframes fl{ from{ transform:translateY(0) scale(.5); opacity:1; } to{ transform:translateY(-150px) scale(1.25); opacity:0; } }
+@media (prefers-reduced-motion:reduce){ .fig *, .doodle .twk, .fl{ animation:none !important; } }
 </style>
 </head>
 <body>
+<div class="doodle l" id="figL" aria-hidden="true"></div>
+<div class="doodle r" id="figR" aria-hidden="true"></div>
 <div class="story">
 
   <div class="screen active" id="intro">
@@ -180,6 +231,7 @@ function show(id){
 
 function renderQ(){
   const q = QUESTIONS[idx];
+  if(idx > 0 && picks[idx - 1]) react(idx - 1, picks[idx - 1], false); else look(INTRO_LOOK);
   $('progress').innerHTML = QUESTIONS.map(function(_, i){ return '<div class="seg' + (i < idx ? ' done' : '') + '"></div>'; }).join('');
   $('count').textContent = (idx + 1) + ' of ' + QUESTIONS.length;
   $('qText').textContent = q.q;
@@ -192,6 +244,7 @@ function renderQ(){
     btn.addEventListener('click', function(){
       picks[idx] = btn.dataset.k;
       btn.classList.add('picked');
+      react(idx, btn.dataset.k, true);
       setTimeout(function(){
         idx++;
         if(idx >= QUESTIONS.length) showResult(); else renderQ();
@@ -238,8 +291,172 @@ function showResult(){
   $('rRunner').textContent = 'runner-up: ' + second.a.name + ' (' + pct(second) + '%)';
   player(second.a, 'rEmbed2', 'rListen2');
   show('result');
+  lookAlbum(best.a);
   track(best.a.id);
 }
+
+/* ===== SIDE STICK-FIGURES: react to every pick ===== */
+const FIG_DECO = '<g fill="#cf2a85" stroke="none" font-family="sans-serif"><text class="twk" x="20" y="60" font-size="26">\u2726</text><text class="twk" x="198" y="40" font-size="20" fill="#a4276b">\u2726</text><text class="twk" x="14" y="190" font-size="22" fill="#f2a6cc">\u2661</text><text class="twk" x="206" y="110" font-size="24">\u266a</text><text class="twk" x="30" y="300" font-size="18" fill="#a4276b">\u2727</text></g>';
+function figureSVG(mirror){
+  const ink = 'fill="none" stroke="#5a1a4a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+  return '<svg class="fig a-idle" viewBox="0 0 240 420" data-eyes="dot" data-mouth="smile">' + FIG_DECO +
+  '<text class="sc sc-back" x="120" y="330" font-size="150" text-anchor="middle" opacity=".85"></text>' +
+  '<text class="sc sc-side" x="' + (mirror ? 206 : 34) + '" y="165" font-size="58" text-anchor="middle"></text>' +
+  '<g ' + ink + (mirror ? ' transform="translate(240 0) scale(-1 1)"' : '') + '><g class="fb">' +
+    '<g class="legL"><path d="M120 262 L108 336"/><path d="M96 334 L112 334 L114 352 L86 352 Q86 342 96 340 Z" fill="#cf2a85"/></g>' +
+    '<g class="legR"><path d="M120 262 L132 336"/><path d="M128 334 L144 334 Q154 342 154 352 L126 352 Z" fill="#cf2a85"/></g>' +
+    '<path d="M120 122 L120 262" stroke-width="4"/>' +
+    '<path class="dress" d="M120 142 L76 268 Q120 284 164 268 Z"/>' +
+    '<g class="gl" stroke="#fff" stroke-width="2"><path d="M100 220 l3 -8 l3 8 l-8 -5 h10 z"/><path d="M134 244 l3 -8 l3 8 l-8 -5 h10 z"/><path d="M118 190 l3 -8 l3 8 l-8 -5 h10 z"/></g>' +
+    '<g class="p p-guitar"><path d="M132 236 L192 168" stroke-width="7"/><path d="M186 160 L200 174" stroke-width="10"/><ellipse cx="128" cy="240" rx="26" ry="21" fill="#ffe08a" transform="rotate(-40 128 240)"/><circle cx="132" cy="236" r="6" fill="#5a1a4a"/></g>' +
+    '<g class="p p-keys"><rect x="76" y="214" width="88" height="24" rx="3" fill="#fff"/><path d="M92 214 L92 238 M106 214 L106 238 M120 214 L120 238 M134 214 L134 238 M148 214 L148 238" stroke-width="1.5"/><rect x="88" y="214" width="8" height="14" fill="#5a1a4a"/><rect x="102" y="214" width="8" height="14" fill="#5a1a4a"/><rect x="130" y="214" width="8" height="14" fill="#5a1a4a"/><rect x="144" y="214" width="8" height="14" fill="#5a1a4a"/></g>' +
+    '<g class="armL"><path d="M120 150 L120 228"/><circle cx="120" cy="230" r="7" fill="#fff1e6"/></g>' +
+    '<g class="armR"><path d="M120 150 L120 228"/><circle cx="120" cy="230" r="7" fill="#fff1e6"/>' +
+      '<g class="p p-mic"><path d="M120 236 L120 250"/><circle cx="120" cy="258" r="9" fill="#cf2a85"/></g>' +
+      '<g class="p p-heart"><path d="M120 236 L120 250" stroke-width="2"/><path d="M120 278 C104 266 106 250 120 256 C134 250 136 266 120 278 Z" fill="#ff5c9a"/></g>' +
+      '<g class="p p-letter"><rect x="102" y="238" width="36" height="24" rx="2" fill="#fff"/><path d="M102 240 L120 253 L138 240"/><path d="M120 270 C113 263 115 258 118 259 C119 259 120 260 120 260 C120 260 121 259 122 259 C125 258 127 263 120 270Z" fill="#e0245e" stroke="none"/></g>' +
+      '<g class="p p-popcorn"><circle cx="109" cy="240" r="6" fill="#fff6c8" stroke-width="2.5"/><circle cx="120" cy="236" r="6.5" fill="#fff6c8" stroke-width="2.5"/><circle cx="131" cy="240" r="6" fill="#fff6c8" stroke-width="2.5"/><path d="M105 244 L109 274 L131 274 L135 244 Z" fill="#e0245e"/><path d="M115 246 L117 272 M125 246 L123 272" stroke="#fff" stroke-width="2.5"/></g>' +
+      '<g class="p p-phone"><rect x="108" y="238" width="24" height="40" rx="5" fill="#333"/><rect x="112" y="243" width="16" height="26" rx="2" fill="#ffd1e7" stroke="none"/><circle cx="120" cy="256" r="4" fill="#cf2a85" stroke="none"/></g>' +
+      '<g class="p p-phoneoff"><rect x="108" y="238" width="24" height="40" rx="5" fill="#333"/><rect x="112" y="243" width="16" height="26" rx="2" fill="#666" stroke="none"/><path d="M114 249 L126 263 M126 249 L114 263" stroke="#ff4d6d" stroke-width="3"/></g>' +
+      '<g class="p p-mug"><rect x="108" y="242" width="22" height="24" rx="3" fill="#fff"/><path d="M130 248 Q141 250 130 260"/><path d="M114 236 Q111 231 114 227 M123 236 Q120 231 123 227" stroke-width="2" opacity=".6"/></g>' +
+      '<g class="p p-rose"><path d="M120 238 L120 272" stroke="#3e9a52"/><circle cx="120" cy="280" r="9" fill="#e0245e"/><path d="M115 281 Q120 273 125 281" stroke-width="2"/></g>' +
+      '<g class="p p-ball"><circle cx="120" cy="256" r="13" fill="#333"/><circle cx="116" cy="251" r="2" fill="#fff" stroke="none"/><circle cx="123" cy="250" r="2" fill="#fff" stroke="none"/><circle cx="120" cy="258" r="2" fill="#fff" stroke="none"/></g>' +
+      '<g class="p p-candle"><rect x="113" y="248" width="14" height="26" rx="2" fill="#fff"/><path d="M120 247 C112 240 118 234 120 230 C122 234 128 240 120 247Z" fill="#ffb02e" stroke-width="2"/></g>' +
+      '<g class="p p-pizza"><path d="M106 240 L134 240 L120 276 Z" fill="#ffd34d"/><circle cx="116" cy="248" r="3" fill="#e0245e" stroke="none"/><circle cx="124" cy="250" r="3" fill="#e0245e" stroke="none"/><circle cx="120" cy="261" r="2.5" fill="#e0245e" stroke="none"/></g>' +
+      '<g class="p p-pola"><rect x="106" y="238" width="28" height="34" fill="#fff"/><rect x="110" y="242" width="20" height="20" fill="#ffd1e7" stroke-width="2"/></g>' +
+    '</g>' +
+    '<g class="head">' +
+      '<path d="M84 84 C68 122 64 162 78 196 C94 184 102 150 97 120 Z" fill="#f7dc8e"/>' +
+      '<path d="M156 84 C172 122 176 162 162 196 C146 184 138 150 143 120 Z" fill="#f7dc8e"/>' +
+      '<circle cx="120" cy="88" r="34" fill="#fff1e6"/>' +
+      '<path d="M86 86 C88 50 152 46 154 86 C142 68 122 62 104 70 C96 74 90 80 86 86 Z" fill="#f7dc8e"/>' +
+      '<g class="e e-dot" fill="#5a1a4a" stroke="none"><circle cx="108" cy="94" r="3"/><circle cx="132" cy="94" r="3"/></g>' +
+      '<g class="e e-side"><circle cx="112" cy="94" r="3" fill="#5a1a4a" stroke="none"/><circle cx="136" cy="94" r="3" fill="#5a1a4a" stroke="none"/><path d="M100 84 L116 82 M124 85 L140 89" stroke-width="2.5"/></g>' +
+      '<g class="e e-heart" fill="#e0245e" stroke="none"><path d="M108 100 C99 93 101 85 106 86 C108 86.5 108 88 108 88 C108 88 108 86.5 110 86 C115 85 117 93 108 100Z"/><path d="M132 100 C123 93 125 85 130 86 C132 86.5 132 88 132 88 C132 88 132 86.5 134 86 C139 85 141 93 132 100Z"/></g>' +
+      '<g class="e e-arc"><path d="M102 95 Q108 87 114 95"/><path d="M126 95 Q132 87 138 95"/></g>' +
+      '<g class="e e-star" fill="#cf2a85" stroke="none" font-family="sans-serif"><text x="108" y="100" font-size="16" text-anchor="middle">\u2726</text><text x="132" y="100" font-size="16" text-anchor="middle">\u2726</text></g>' +
+      '<circle cx="99" cy="104" r="5" fill="#ffb3d1" stroke="none" opacity=".7"/><circle cx="141" cy="104" r="5" fill="#ffb3d1" stroke="none" opacity=".7"/>' +
+      '<path class="m m-smile" d="M111 106 Q120 114 129 106 Q120 109 111 106 Z" fill="#d6204f" stroke="#d6204f" stroke-width="2"/>' +
+      '<ellipse class="m m-open" cx="120" cy="110" rx="6" ry="7.5" fill="#d6204f" stroke="#d6204f" stroke-width="2"/>' +
+      '<path class="m m-flat" d="M113 108 L127 108" stroke="#d6204f" stroke-width="3.5"/>' +
+      '<g class="p p-headphones"><path d="M86 84 Q120 28 154 84" stroke-width="5"/><rect x="80" y="80" width="12" height="22" rx="5" fill="#ff7ec0"/><rect x="148" y="80" width="12" height="22" rx="5" fill="#ff7ec0"/></g>' +
+      '<g class="p p-clip"><rect x="138" y="62" width="16" height="6" rx="2" fill="#ff7ec0" transform="rotate(-30 146 65)"/></g>' +
+      '<g class="p p-shades"><rect x="97" y="86" width="19" height="13" rx="4" fill="#222"/><rect x="124" y="86" width="19" height="13" rx="4" fill="#222"/><path d="M116 91 L124 91"/></g>' +
+      '<path class="p p-crown" d="M96 58 L102 38 L111 52 L120 34 L129 52 L138 38 L144 58 Z" fill="#ffd34d"/>' +
+    '</g>' +
+  '</g></g></svg>';
+}
+const figEls = [];
+['figL','figR'].forEach(function(id, i){
+  const box = document.getElementById(id);
+  box.innerHTML = figureSVG(i === 1);
+  figEls.push({ box:box, svg:box.querySelector('svg') });
+});
+
+/* al/ar = left/right arm angle, ll/lr = legs, tilt = head, a = body motion, w = arm motion */
+const POSES = {
+  idle:  { al:15,  ar:15,  ll:3,  lr:3,  tilt:0,  a:'idle', w:'' },
+  wave:  { al:15,  ar:125, ll:3,  lr:3,  tilt:4,  a:'idle', w:'wave' },
+  cheer: { al:160, ar:160, ll:10, lr:10, tilt:0,  a:'jump', w:'' },
+  love:  { al:75,  ar:75,  ll:4,  lr:4,  tilt:8,  a:'sway', w:'' },
+  shrug: { al:45,  ar:45,  ll:2,  lr:2,  tilt:10, a:'idle', w:'' },
+  dance: { al:130, ar:60,  ll:2,  lr:2,  tilt:0,  a:'sway', w:'dance' },
+  mic:   { al:25,  ar:140, ll:6,  lr:6,  tilt:-4, a:'sway', w:'' },
+  chill: { al:8,   ar:8,   ll:0,  lr:0,  tilt:-8, a:'idle', w:'' },
+  dreamy:{ al:15,  ar:105, ll:3,  lr:3,  tilt:10, a:'sway', w:'' },
+  sway:  { al:40,  ar:40,  ll:3,  lr:3,  tilt:6,  a:'sway', w:'' },
+  point: { al:10,  ar:100, ll:3,  lr:3,  tilt:-3, a:'idle', w:'' },
+  glam:  { al:50,  ar:50,  ll:6,  lr:6,  tilt:-6, a:'sway', w:'' },
+  guitar:{ al:-8,  ar:74,  ll:3,  lr:3,  tilt:6,  a:'sway', w:'' },
+  solo:  { al:25,  ar:140, ll:6,  lr:6,  tilt:-4, a:'jump', w:'' },
+  keys:  { al:28,  ar:28,  ll:3,  lr:3,  tilt:4,  a:'sway', w:'' },
+  toast: { al:20,  ar:120, ll:3,  lr:3,  tilt:6,  a:'sway', w:'' },
+  selfie:{ al:15,  ar:120, ll:3,  lr:3,  tilt:10, a:'idle', w:'' }
+};
+const INTRO_LOOK = { pose:'wave', eyes:'dot', mouth:'smile', props:[], dress:'#ffc2de' };
+function look(L){
+  const P = POSES[L.pose] || POSES.idle;
+  figEls.forEach(function(f){
+    const s = f.svg, st = s.style;
+    st.setProperty('--al', P.al); st.setProperty('--ar', P.ar);
+    st.setProperty('--ll', P.ll); st.setProperty('--lr', P.lr); st.setProperty('--tilt', P.tilt);
+    if(L.dress) st.setProperty('--dress', L.dress);
+    s.setAttribute('class', 'fig a-' + P.a + (P.w ? ' w-' + P.w : '') + (L.props || []).map(function(p){ return ' has-' + p; }).join(''));
+    s.setAttribute('data-eyes', L.eyes || 'dot');
+    s.setAttribute('data-mouth', L.mouth || 'smile');
+    [['.sc-side', L.scene], ['.sc-back', L.back]].forEach(function(pair){
+      const el = s.querySelector(pair[0]), em = pair[1] || '';
+      if(el.textContent !== em){
+        el.textContent = em;
+        el.classList.remove('pop');
+        if(em){ void el.getBoundingClientRect(); el.classList.add('pop'); }
+      }
+    });
+  });
+}
+function burst(list){
+  [].concat(list).forEach(function(em, k){
+    figEls.forEach(function(f){
+      const el = document.createElement('span');
+      el.className = 'fl'; el.textContent = em;
+      el.style.left = (22 + Math.random() * 50) + '%';
+      el.style.animationDelay = (k * 0.15) + 's';
+      f.box.appendChild(el);
+      el.addEventListener('animationend', function(){ el.remove(); });
+    });
+  });
+}
+/* one reaction per answer: [question][a|b|c]. scene = emoji beside the figure, back = emoji backdrop */
+const REACT_Q = [
+  { a:{ pose:'dreamy', eyes:'heart', mouth:'smile', props:['letter'], scene:'\ud83d\udc8c' },
+    b:{ pose:'toast',  eyes:'arc',   mouth:'smile', props:['popcorn'], scene:'\ud83c\udfac' },
+    c:{ pose:'shrug',  eyes:'dot',   mouth:'flat',  props:['phoneoff','shades'], scene:'\ud83d\udd15' } },
+  { a:{ pose:'solo',   eyes:'arc',   mouth:'open',  props:['mic'], scene:'\ud83c\udfb6' },
+    b:{ pose:'dance',  eyes:'arc',   mouth:'open',  props:[], scene:'\ud83d\udc6f' },
+    c:{ pose:'chill',  eyes:'arc',   mouth:'smile', props:[], back:'\ud83d\udecb\ufe0f' } },
+  { a:{ pose:'dreamy', eyes:'arc',   mouth:'smile', props:['pola'], scene:'\ud83d\udcfc' },
+    b:{ pose:'sway',   eyes:'dot',   mouth:'smile', props:['pola'], scene:'\ud83d\uddbc\ufe0f' },
+    c:{ pose:'selfie', eyes:'star',  mouth:'open',  props:['phone'], scene:'\ud83d\udcf8' } },
+  { a:{ pose:'glam',   eyes:'star',  mouth:'smile', props:['crown','glam'], scene:'\ud83d\udc8e', dress:'#ffd34d' },
+    b:{ pose:'wave',   eyes:'dot',   mouth:'smile', props:[], scene:'\ud83d\udc84', dress:'#ffc2de' },
+    c:{ pose:'chill',  eyes:'dot',   mouth:'smile', props:['clip'], scene:'\ud83d\udc56', dress:'#9bc1e8' } },
+  { a:{ pose:'point',  eyes:'heart', mouth:'smile', props:['rose'], scene:'\ud83d\udd6f\ufe0f' },
+    b:{ pose:'dreamy', eyes:'arc',   mouth:'smile', props:['mug'], scene:'\ud83d\udcac' },
+    c:{ pose:'shrug',  eyes:'side',  mouth:'flat',  props:['ball'], scene:'\ud83d\udea9' } },
+  { a:{ pose:'dance',  eyes:'arc',   mouth:'open',  props:[], scene:'\ud83e\udea9' },
+    b:{ pose:'toast',  eyes:'arc',   mouth:'open',  props:['pizza'], scene:'\ud83c\udf88' },
+    c:{ pose:'chill',  eyes:'arc',   mouth:'smile', props:['candle'], scene:'\ud83d\udd6f\ufe0f' } },
+  { a:{ pose:'love',   eyes:'star',  mouth:'open',  props:['crown'], back:'\ud83c\udff0' },
+    b:{ pose:'sway',   eyes:'arc',   mouth:'smile', props:[], back:'\ud83c\udfe1' },
+    c:{ pose:'point',  eyes:'dot',   mouth:'smile', props:['shades'], back:'\ud83c\udf06' } },
+  { a:{ pose:'keys',   eyes:'star',  mouth:'open',  props:['keys','glam'], scene:'\ud83c\udf9b\ufe0f', dress:'#d9a6ff' },
+    b:{ pose:'sway',   eyes:'arc',   mouth:'smile', props:['headphones'], scene:'\u2601\ufe0f', dress:'#cdb4f6' },
+    c:{ pose:'guitar', eyes:'arc',   mouth:'smile', props:['guitar'], scene:'\ud83c\udfbb', dress:'#f4d58a' } }
+];
+function react(qi, key, pop){
+  look(REACT_Q[qi][key]);
+  if(pop) burst(QUESTIONS[qi][key].em);
+}
+const ALBUM_LOOK = {
+  taylorswift:{ pose:'guitar', eyes:'arc',  mouth:'smile', props:['guitar'] },
+  fearless:   { pose:'cheer',  eyes:'heart',mouth:'open',  props:[] },
+  speaknow:   { pose:'mic',    eyes:'arc',  mouth:'open',  props:['mic'] },
+  red:        { pose:'dreamy', eyes:'arc',  mouth:'smile', props:['pola'] },
+  '1989':     { pose:'dance',  eyes:'dot',  mouth:'smile', props:['shades'] },
+  reputation: { pose:'chill',  eyes:'dot',  mouth:'flat',  props:['shades'] },
+  lover:      { pose:'love',   eyes:'heart',mouth:'smile', props:['heart'] },
+  folklore:   { pose:'sway',   eyes:'arc',  mouth:'smile', props:[] },
+  evermore:   { pose:'point',  eyes:'dot',  mouth:'smile', props:[] },
+  midnights:  { pose:'shrug',  eyes:'dot',  mouth:'flat',  props:[] },
+  ttpd:       { pose:'dreamy', eyes:'dot',  mouth:'flat',  props:['pola'] },
+  showgirl:   { pose:'mic',    eyes:'star', mouth:'open',  props:['mic','crown','glam'] }
+};
+function lookAlbum(al){
+  const L = Object.assign({}, ALBUM_LOOK[al.id] || INTRO_LOOK, { dress:al.color });
+  look(L);
+  burst(['\ud83c\udf89', '\ud83d\udcbf', '\u2728']);
+}
+look(INTRO_LOOK);
 
 function restart(){ idx = 0; picks = []; renderQ(); }
 $('introVinyl').innerHTML = vinyl('#ff7ec0', false);
