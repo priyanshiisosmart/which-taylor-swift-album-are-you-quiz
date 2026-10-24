@@ -127,7 +127,6 @@ body{
 <div class="story">
 
   <div class="screen active" id="intro">
-    <div class="eyebrow">this or that</div>
     <div class="title">Which Taylor Swift<br>Album Are You?</div>
     <div id="introVinyl"></div>
     <div class="sub">8 quick picks. No overthinking, just trust your gut ✨</div>
@@ -210,7 +209,7 @@ const SPOTIFY_ALBUM_IDS = {
 };
 
 const $ = function(id){ return document.getElementById(id); };
-let idx = 0, picks = [];
+let idx = 0, picks = [], locked = false;
 
 function vinyl(color, big){
   const label = color === '#2b2b2b' ? '#5a5a5a' : color;
@@ -242,11 +241,15 @@ function renderQ(){
   $('choices').innerHTML = html(q.a, 'a') + '<div class="or">or</div>' + html(q.b, 'b') + '<div class="or">or</div>' + html(q.c, 'c');
   $('choices').querySelectorAll('.choice').forEach(function(btn){
     btn.addEventListener('click', function(){
-      picks[idx] = btn.dataset.k;
+      if(locked) return;            /* ignore extra taps while moving on */
+      locked = true;
+      const qi = idx;
+      picks[qi] = btn.dataset.k;
       btn.classList.add('picked');
-      react(idx, btn.dataset.k, true);
+      react(qi, btn.dataset.k, true);
       setTimeout(function(){
-        idx++;
+        locked = false;
+        idx = qi + 1;
         if(idx >= QUESTIONS.length) showResult(); else renderQ();
       }, 260);
     });
@@ -259,6 +262,7 @@ function showResult(){
   const sum = {R:0,L:0,N:0,S:0}, n = {R:0,L:0,N:0,S:0};
   QUESTIONS.forEach(function(q, i){
     const o = q[picks[i]];
+    if(!o) return;
     sum[o.ax] += o.v; n[o.ax]++;
   });
   const me = {};
@@ -458,11 +462,11 @@ function lookAlbum(al){
 }
 look(INTRO_LOOK);
 
-function restart(){ idx = 0; picks = []; renderQ(); }
+function restart(){ locked = false; idx = 0; picks = []; renderQ(); }
 $('introVinyl').innerHTML = vinyl('#ff7ec0', false);
 $('start').addEventListener('click', restart);
 $('again').addEventListener('click', restart);
-$('back').addEventListener('click', function(){ if(idx > 0){ idx--; renderQ(); } });
+$('back').addEventListener('click', function(){ if(!locked && idx > 0){ idx--; renderQ(); } });
 
 /* ===== ANONYMOUS PLAYER TRACKING =====
    Paste your Google Apps Script web app URL below (see setup steps).
